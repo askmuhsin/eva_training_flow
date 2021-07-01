@@ -1,7 +1,6 @@
 # eva_training_flow
-This is an updated version of prev training template for eva
 
-to train the model
+To train the model 👇
 ```python
 python main.py
 ```
