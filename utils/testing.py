@@ -1,6 +1,5 @@
 import torch
 import torch.nn.functional as F
-from tqdm.auto import tqdm
 
 def test(
     model, device, 
@@ -10,7 +9,6 @@ def test(
     lr_scheduler=None
 ):
     model.eval()
-    pbar = tqdm(test_loader)
     
     test_loss = 0
     correct = 0
@@ -21,11 +19,9 @@ def test(
             test_loss += criterion(y_pred, target)
             pred = y_pred.argmax(dim=1, keepdim=True) 
             correct += pred.eq(target.view_as(pred)).sum().item()
-            pbar.set_description(
-                desc=f'TEST Epoch:{epoch}'
-            )
 
     test_loss /= len(test_loader.dataset)
+    test_loss = test_loss.item()
     test_acc = 100. * correct / len(test_loader.dataset)
     
     print(

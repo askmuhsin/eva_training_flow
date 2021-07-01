@@ -1,4 +1,4 @@
-from tqdm.auto import tqdm
+from tqdm import tqdm
 import torch.nn.functional as F
 
 def train(
@@ -35,10 +35,7 @@ def train(
         processed += len(data)
 
         pbar.set_description(
-            desc= f'TRAIN Epoch:{epoch}\
-            Loss:{round(loss.item(), 5)}\
-            Batch:{batch_idx}\
-            Acc:{100*correct/processed:0.2f}'
+            desc=f"TRAIN Epoch:{epoch} Loss:{round(loss.item(), 4)} Batch:{batch_idx} Acc:{100*correct/processed:0.2f}"
         )
         train_batch_acc.append(100*correct/processed)
     
