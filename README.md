@@ -6,6 +6,26 @@ to train the model
 python main.py
 ```
 
+## Flow Structure
+```
+.
+|-- main.py
+|-- models                             ## directory for model files
+|   |-- __init__.py
+|   `-- resnet.py
+|-- README.md
+|-- tests                             ## add tests, TODO
+|   `-- test_modules_v1.ipynb
+`-- utils                             ## all utils go here
+    |-- __init__.py
+    |-- data.py                       ## DataLoader
+    |-- regularizations.py            ## Regularizations, album lib
+    |-- setup.py                      ## device, cuda, ...
+    |-- testing.py                    ## test/eval fn
+    |-- training.py                   ## training fn
+    `-- viz.py                        ## planning to add gradcam, misclassficiation here
+```
+
 ## TODO
 - [ ] add args for epochs, lr `python main.py -lr 0.001 -epochs 100`
 - [ ] modify resnet model to have 7X7 channels on layer before GAP
