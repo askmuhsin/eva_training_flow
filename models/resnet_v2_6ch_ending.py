@@ -18,7 +18,7 @@ class BasicBlock(nn.Module):
         super(BasicBlock, self).__init__()
         self.conv1 = nn.Conv2d(
             in_planes, planes, kernel_size=3, 
-            stride=stride, padding=1, bias=False
+            stride=stride, padding=stride, bias=False
         )
         self.bn1 = nn.BatchNorm2d(planes)
         self.conv2 = nn.Conv2d(
@@ -32,7 +32,7 @@ class BasicBlock(nn.Module):
             self.shortcut = nn.Sequential(
                 nn.Conv2d(
                     in_planes, self.expansion*planes,
-                    kernel_size=1, stride=stride, bias=False
+                    kernel_size=1, stride=stride, padding=(stride - 1), bias=False
                 ),
                 nn.BatchNorm2d(self.expansion*planes)
             )
