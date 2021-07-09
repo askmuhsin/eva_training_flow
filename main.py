@@ -1,7 +1,6 @@
 import sys
 sys.path.append('./')
 
-from models.resnet import ResNet18
 from utils import (
     setup, data, viz
 )
@@ -23,29 +22,33 @@ train_loader = data.CIFAR10_dataset(
 ).get_loader()
 test_loader = data.CIFAR10_dataset(
     train=False, cuda=cuda
-).get_loader()
+).get_loader()    
+    
+def train_model(epochs, model, lr=0.01):
+    net = model.to(device)
+    viz.show_model_summary(net)
 
-net = ResNet18().to(device)
-viz.show_model_summary(net)
-
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(
-    net.parameters(), lr=0.01,
-    momentum=0.9, weight_decay=5e-4
-)
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
-
-EPOCHS = 2
-print(f"[INFO] Begin training for {EPOCHS} epochs")
-for epoch in range(EPOCHS):
-    train_batch_loss, train_batch_acc= train(
-        net, device, 
-        train_loader, optimizer, criterion, epoch,
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(
+        net.parameters(), lr=lr,
+        momentum=0.9, weight_decay=5e-4
     )
-    train_loss = np.mean(train_batch_loss)
-    train_acc = np.mean(train_batch_acc)
-    test_loss, test_acc = test(
-        net, device,
-        test_loader, criterion, epoch,
-    )
-    scheduler.step()
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+
+    EPOCHS = epochs
+
+    print(f"[INFO] Begin training for {EPOCHS} epochs")
+    for epoch in range(EPOCHS):
+        train_batch_loss, train_batch_acc= train(
+            net, device, 
+            train_loader, optimizer, criterion, epoch,
+        )
+        train_loss = np.mean(train_batch_loss)
+        train_acc = np.mean(train_batch_acc)
+        test_loss, test_acc = test(
+            net, device,
+            test_loader, criterion, epoch,
+        )
+        scheduler.step()
+    
+    return net
