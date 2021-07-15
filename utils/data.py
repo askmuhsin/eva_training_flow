@@ -18,7 +18,8 @@ class CIFAR10_dataset():
     def __init__(
         self,
         train, cuda,
-        root='./data'
+        root='./data',
+        normalize=True,
     ):
         self.train = train
         self.cuda = cuda
@@ -27,34 +28,42 @@ class CIFAR10_dataset():
         self.mean = (0.491, 0.482, 0.447)
         self.std = (0.247, 0.243, 0.262)
         
-        self.train_transforms = A.Compose([
-            A.HorizontalFlip(p=0.5),
-            A.ShiftScaleRotate(
-               shift_limit=0.0625, scale_limit=0.1, 
-                rotate_limit=45, interpolation=1, 
-                border_mode=4, p=0.2
-            ),
-            A.CoarseDropout(
-                max_holes=2, max_height=8, 
-                max_width=8, p=0.1
-            ),
-            A.RandomBrightnessContrast(p=0.2),
-            A.ToGray(p=0.1),
-            A.Normalize(
-                mean=self.mean, 
-                std=self.std,
-                always_apply=True
-            ),
-            ToTensorV2()
-        ])
-        self.test_transforms = A.Compose([
-            A.Normalize(
-                mean=self.mean, 
-                std=self.std,
-                always_apply=True
-            ),
-            ToTensorV2()
-        ])
+        if normalize:
+            self.train_transforms = A.Compose([
+                A.Normalize(
+                    mean=self.mean, 
+                    std=self.std,
+                    always_apply=True
+                ),
+                A.RandomCrop(32, 32, always_apply=False, p=0.5),
+                A.CoarseDropout(
+                    max_holes=3, max_height=16, max_width=16, min_holes=None, min_height=None, min_width=None, 
+                    fill_value=(0.491, 0.482, 0.447), mask_fill_value=None, always_apply=False, p=0.25
+                ),
+                A.Rotate(limit=5, interpolation=1, border_mode=4, value=None, mask_value=None, always_apply=False, p=0.5),
+                ToTensorV2()
+            ])
+            self.test_transforms = A.Compose([
+                A.Normalize(
+                    mean=self.mean, 
+                    std=self.std,
+                    always_apply=True
+                ),
+                ToTensorV2()
+            ])
+        else:
+            self.train_transforms = A.Compose([
+                A.RandomCrop(32, 32, always_apply=False, p=0.5),
+                A.CoarseDropout(
+                    max_holes=3, max_height=16, max_width=16, min_holes=None, min_height=None, min_width=None, 
+                    fill_value=(0.491, 0.482, 0.447), mask_fill_value=None, always_apply=False, p=0.25
+                ),
+                A.Rotate(limit=5, interpolation=1, border_mode=4, value=None, mask_value=None, always_apply=False, p=0.5),
+                ToTensorV2()
+            ])
+            self.test_transforms = A.Compose([
+                ToTensorV2()
+            ])
         
         if self.train:
             self.transforms = self.train_transforms
