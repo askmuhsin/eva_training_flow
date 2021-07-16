@@ -1,8 +1,17 @@
 # eva_training_flow
 
-To train the model 👇
+To train the model use the Trainer class 👇
 ```python
-python main.py
+from models import resnet_v2_6ch_ending     ## import model
+from main import Trainer
+from main import show_misclassification     ## utility to show misclassifications and gradcam
+
+trainer = Trainer(
+    resnet_v2_6ch_ending.ResNet18(),
+    # model_path='../data/model_state/R18_6_channel_with_augmentation_3_repeat.pt',     ## model path is optional, if required to resume training
+)
+trainer.train_model(epochs=40)  ## to start training
+show_misclassification(trainer) ## to view misclassifications
 ```
 
 ## Flow Structure
@@ -20,18 +29,8 @@ python main.py
     |-- data.py                       ## DataLoader
     |-- regularizations.py            ## Regularizations, album lib
     |-- setup.py                      ## device, cuda, ...
-    |-- testing.py                    ## test/eval fn
+    |-- testing.py                    ## test fns, 
     |-- training.py                   ## training fn
-    `-- viz.py                        ## planning to add gradcam, misclassficiation here
+    `-- viz.py                        ## gradcam, and probability visualizations
 ```
 
-## TODO
-- [ ] add args for epochs, lr `python main.py -lr 0.001 -epochs 100`
-- [ ] modify resnet model to have 7X7 channels on layer before GAP
-- [ ] remove linear layer, use GAP
-- [ ] add gradcam
-- [ ] add other visualizations (misclassification code,)
-- [ ] add README for traingin flow
-- [ ] move regularizations to seperate dir
-
-_Note : the tasks specific to experiment wont be in this repo_
