@@ -1,5 +1,8 @@
 import torch
+from tqdm import tqdm
 import torch.nn.functional as F
+from utils.setup import get_device
+from collections import defaultdict
 
 def test(
     model, device, 
@@ -32,3 +35,41 @@ def test(
     )
     
     return test_loss, test_acc
+
+
+def get_sample_predictions(trainer, correct_samples=20, mistake_samples=20):
+    device = get_device()
+    selected_preds = defaultdict(lambda : defaultdict(list))
+    with torch.no_grad():
+        for (data, target), (data_n, _) in tqdm(
+            zip(trainer.test_loader, trainer.test_loader_unnormalized),
+            desc='Generating sample predictions'
+        ):
+            data, target = data.to(device), target.to(device)
+            y_pred = trainer.net(data)
+            pred = y_pred.argmax(dim=1, keepdim=True)
+            correctness = pred.eq(target.view_as(pred))
+
+            for n, correct in enumerate(correctness):
+                actual_class = target[n].item()
+                pred_class = pred[n].item()
+                scores = y_pred[n].cpu().numpy()
+
+                temp_content = {
+                    'pred_class': pred_class,
+                    'scores': scores,
+                    'data': data[n].cpu(),
+                    'data_unnormalized': data_n[n].cpu(),
+                    'actual_class': actual_class,
+                    'pred_class': pred_class,     
+                }
+
+                if correct[0].item():
+                    if len(selected_preds['correct'][actual_class]) >= correct_samples:
+                        continue
+                    selected_preds['correct'][actual_class].append(temp_content)
+                else:
+                    if len(selected_preds['mistakes'][actual_class]) >= mistake_samples:
+                        continue
+                    selected_preds['mistakes'][actual_class].append(temp_content)
+    return selected_preds

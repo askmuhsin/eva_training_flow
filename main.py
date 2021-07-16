@@ -98,3 +98,13 @@ class Trainer:
             self.test_loader, self.criterion, epoch=0,
         )
 
+
+def show_misclassification(trainer):
+    from utils.viz import visualize_sample
+    from utils.testing import get_sample_predictions
+    
+    sample_preds = get_sample_predictions(trainer)
+    
+    for class_, samples in sample_preds['mistakes'].items():
+        for sample in samples[:2]:
+            visualize_sample(trainer, sample)
