@@ -9,8 +9,8 @@ def show_model_summary(model, input_size=(3, 32, 32)):
     summary(model, input_size=input_size)
 
 
-def visualize_gradcam(raw_image, processed_img, model):
-    cam_extractor = SmoothGradCAMpp(model.eval(), 'layer4')
+def visualize_gradcam(raw_image, processed_img, model, layer_name):
+    cam_extractor = SmoothGradCAMpp(model.eval(), layer_name)
     out = model(processed_img.unsqueeze(0))
     activation_map = cam_extractor(out.squeeze(0).argmax().item(), out)
     result = overlay_mask(
@@ -30,9 +30,9 @@ def plot_probabilites(pred, actual_class, pred_class, class_names):
     plt.show()
     
 
-def visualize_sample(trainer, sample):
+def visualize_sample(trainer, sample, cam_layer_name='layer4'):
     raw_img, act_map, overlay = visualize_gradcam(
-        sample['data_unnormalized'], sample['data'], trainer.net.cpu()
+        sample['data_unnormalized'], sample['data'], trainer.net.cpu(), cam_layer_name
     )
     
     plt.figure(figsize=(10, 5))

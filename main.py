@@ -99,7 +99,7 @@ class Trainer:
         )
 
 
-def show_misclassification(trainer):
+def show_misclassification(trainer, cam_layer_name='layer4'):
     from utils.viz import visualize_sample
     from utils.testing import get_sample_predictions
     
@@ -107,4 +107,4 @@ def show_misclassification(trainer):
     
     for class_, samples in sample_preds['mistakes'].items():
         for sample in samples[:2]:
-            visualize_sample(trainer, sample)
+            visualize_sample(trainer, sample, cam_layer_name)
